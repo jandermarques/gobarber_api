@@ -57,54 +57,44 @@ describe('SendForgotPasswordEmail', function () {
     });
     it('should be able to reset the password', function () { return __awaiter(void 0, void 0, void 0, function () {
         var user, token, generateHash, updatedUser;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0: return [4 /*yield*/, fakeUsersRepository.create({
                         name: 'John Doe',
                         email: 'jdoe@example.com',
                         password: '123456',
                     })];
                 case 1:
-                    user = _a.sent();
+                    user = _b.sent();
                     return [4 /*yield*/, fakeUserTokensRepository.generate(user.id)];
                 case 2:
-                    token = (_a.sent()).token;
+                    token = (_b.sent()).token;
                     generateHash = jest.spyOn(fakeHashProvider, 'generateHash');
                     return [4 /*yield*/, resetPassword.execute({
                             password: '123123',
                             token: token,
                         })];
                 case 3:
-                    _a.sent();
+                    _b.sent();
                     return [4 /*yield*/, fakeUsersRepository.findById(user.id)];
                 case 4:
-                    updatedUser = _a.sent();
+                    updatedUser = _b.sent();
                     expect(generateHash).toHaveBeenCalledWith('123123');
-                    expect(updatedUser === null || updatedUser === void 0 ? void 0 : updatedUser.password).toBe('123123');
+                    expect((_a = updatedUser) === null || _a === void 0 ? void 0 : _a.password).toBe('123123');
                     return [2 /*return*/];
             }
         });
     }); });
     it('should not be able to reset the password with ano-existing token', function () { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            expect(resetPassword.execute({
-                token: 'non-existing-token',
-                password: '123456',
-            })).rejects.toBeInstanceOf(AppError_1.default);
-            return [2 /*return*/];
-        });
-    }); });
-    it('should not be able to reset the password with ano-existing user', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var token;
-        return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fakeUserTokensRepository.generate('non-existing-user')];
-                case 1:
-                    token = (_a.sent()).token;
-                    expect(resetPassword.execute({
-                        token: token,
+                case 0: return [4 /*yield*/, expect(resetPassword.execute({
+                        token: 'non-existing-token',
                         password: '123456',
-                    })).rejects.toBeInstanceOf(AppError_1.default);
+                    })).rejects.toBeInstanceOf(AppError_1.default)];
+                case 1:
+                    _a.sent();
                     return [2 /*return*/];
             }
         });
@@ -116,10 +106,29 @@ describe('SendForgotPasswordEmail', function () {
                 case 0: return [4 /*yield*/, fakeUserTokensRepository.generate('non-existing-user')];
                 case 1:
                     token = (_a.sent()).token;
-                    expect(resetPassword.execute({
-                        token: token,
-                        password: '123456',
-                    })).rejects.toBeInstanceOf(AppError_1.default);
+                    return [4 /*yield*/, expect(resetPassword.execute({
+                            token: token,
+                            password: '123456',
+                        })).rejects.toBeInstanceOf(AppError_1.default)];
+                case 2:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('should not be able to reset the password with ano-existing user', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var token;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, fakeUserTokensRepository.generate('non-existing-user')];
+                case 1:
+                    token = (_a.sent()).token;
+                    return [4 /*yield*/, expect(resetPassword.execute({
+                            token: token,
+                            password: '123456',
+                        })).rejects.toBeInstanceOf(AppError_1.default)];
+                case 2:
+                    _a.sent();
                     return [2 /*return*/];
             }
         });

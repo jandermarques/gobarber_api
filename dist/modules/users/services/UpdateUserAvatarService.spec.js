@@ -43,25 +43,29 @@ var AppError_1 = __importDefault(require("@shared/errors/AppError"));
 var FakeStorageProvider_1 = __importDefault(require("@shared/container/providers/StorageProvider/fakes/FakeStorageProvider"));
 var FakeUsersRepository_1 = __importDefault(require("../repositories/fakes/FakeUsersRepository"));
 var UpdateUserAvatarService_1 = __importDefault(require("./UpdateUserAvatarService"));
+var fakeStorageProvider;
+var fakeUsersRepository;
+var updateUserAvatar;
 describe('UpdateUserAvatar', function () {
+    beforeEach(function () {
+        fakeStorageProvider = new FakeStorageProvider_1.default();
+        fakeUsersRepository = new FakeUsersRepository_1.default();
+        updateUserAvatar = new UpdateUserAvatarService_1.default(fakeUsersRepository, fakeStorageProvider);
+    });
     it('should not be able to update avatar', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var fakeStorageProvider, fakeUsersRepository, updateUserAvatar, user;
+        var user;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    fakeStorageProvider = new FakeStorageProvider_1.default();
-                    fakeUsersRepository = new FakeUsersRepository_1.default();
-                    updateUserAvatar = new UpdateUserAvatarService_1.default(fakeUsersRepository, fakeStorageProvider);
-                    return [4 /*yield*/, fakeUsersRepository.create({
-                            name: 'Fulano da Silva',
-                            email: 'fulano@gmail.com',
-                            password: '123456789',
-                        })];
+                case 0: return [4 /*yield*/, fakeUsersRepository.create({
+                        name: 'Fulano da Silva',
+                        email: 'fulano@gmail.com',
+                        password: '123456789',
+                    })];
                 case 1:
                     user = _a.sent();
                     return [4 /*yield*/, updateUserAvatar.execute({
                             user_id: user.id,
-                            avatarFilename: 'avatar.jpg'
+                            avatarFilename: 'avatar.jpg',
                         })];
                 case 2:
                     _a.sent();
@@ -71,27 +75,24 @@ describe('UpdateUserAvatar', function () {
         });
     }); });
     it('should not be able to update avatar from non existing user', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var fakeStorageProvider, fakeUsersRepository, updateUserAvatar;
         return __generator(this, function (_a) {
-            fakeStorageProvider = new FakeStorageProvider_1.default();
-            fakeUsersRepository = new FakeUsersRepository_1.default();
-            updateUserAvatar = new UpdateUserAvatarService_1.default(fakeUsersRepository, fakeStorageProvider);
-            expect(updateUserAvatar.execute({
-                user_id: 'non-existing-user',
-                avatarFilename: 'avatar.jpg'
-            })).rejects.toBeInstanceOf(AppError_1.default);
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, expect(updateUserAvatar.execute({
+                        user_id: 'non-existing-user',
+                        avatarFilename: 'avatar.jpg',
+                    })).rejects.toBeInstanceOf(AppError_1.default)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
         });
     }); });
     it('should be able to delete old avatar when updating new one', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var fakeStorageProvider, fakeUsersRepository, deleteFile, updateUserAvatar, user;
+        var deleteFile, user;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    fakeStorageProvider = new FakeStorageProvider_1.default();
-                    fakeUsersRepository = new FakeUsersRepository_1.default();
                     deleteFile = jest.spyOn(fakeStorageProvider, 'deleteFile');
-                    updateUserAvatar = new UpdateUserAvatarService_1.default(fakeUsersRepository, fakeStorageProvider);
                     return [4 /*yield*/, fakeUsersRepository.create({
                             name: 'Fulano da Silva',
                             email: 'fulano@gmail.com',
@@ -101,13 +102,13 @@ describe('UpdateUserAvatar', function () {
                     user = _a.sent();
                     return [4 /*yield*/, updateUserAvatar.execute({
                             user_id: user.id,
-                            avatarFilename: 'avatar.jpg'
+                            avatarFilename: 'avatar.jpg',
                         })];
                 case 2:
                     _a.sent();
                     return [4 /*yield*/, updateUserAvatar.execute({
                             user_id: user.id,
-                            avatarFilename: 'avatar2.jpg'
+                            avatarFilename: 'avatar2.jpg',
                         })];
                 case 3:
                     _a.sent();

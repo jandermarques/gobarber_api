@@ -45,6 +45,29 @@ var UsersRepository = /** @class */ (function () {
     function UsersRepository() {
         this.ormRepository = typeorm_1.getRepository(User_1.default);
     }
+    UsersRepository.prototype.findAllProviders = function (_a) {
+        var except_user_id = _a.except_user_id;
+        return __awaiter(this, void 0, void 0, function () {
+            var users;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (!except_user_id) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.ormRepository.find({
+                                where: { id: typeorm_1.Not(except_user_id) },
+                            })];
+                    case 1:
+                        users = _b.sent();
+                        return [3 /*break*/, 4];
+                    case 2: return [4 /*yield*/, this.ormRepository.find()];
+                    case 3:
+                        users = _b.sent();
+                        _b.label = 4;
+                    case 4: return [2 /*return*/, users];
+                }
+            });
+        });
+    };
     UsersRepository.prototype.findById = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             var user;

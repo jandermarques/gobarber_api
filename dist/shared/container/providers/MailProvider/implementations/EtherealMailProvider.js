@@ -1,4 +1,16 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,9 +52,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var nodemailer_1 = __importDefault(require("nodemailer"));
+var tsyringe_1 = require("tsyringe");
 var EtherealMailProvider = /** @class */ (function () {
-    function EtherealMailProvider() {
+    function EtherealMailProvider(mailTemplateProvider) {
         var _this = this;
+        this.mailTemplateProvider = mailTemplateProvider;
         nodemailer_1.default.createTestAccount().then(function (account) {
             var transporter = nodemailer_1.default.createTransport({
                 host: account.smtp.host,
@@ -56,19 +70,28 @@ var EtherealMailProvider = /** @class */ (function () {
             _this.client = transporter;
         });
     }
-    EtherealMailProvider.prototype.sendMail = function (to, body) {
+    EtherealMailProvider.prototype.sendMail = function (_a) {
+        var to = _a.to, from = _a.from, subject = _a.subject, templateData = _a.templateData;
+        var _b, _c;
         return __awaiter(this, void 0, void 0, function () {
-            var message;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.client.sendMail({
-                            from: 'Equipe GoBarber <equipe@gobarber.com.br>',
-                            to: to,
-                            subject: 'Recuperação de senha',
-                            text: body,
-                        })];
-                    case 1:
-                        message = _a.sent();
+            var message, _d, _e, _f;
+            return __generator(this, function (_g) {
+                switch (_g.label) {
+                    case 0:
+                        _e = (_d = this.client).sendMail;
+                        _f = {
+                            from: {
+                                name: ((_b = from) === null || _b === void 0 ? void 0 : _b.name) || 'Equipe GoBarber',
+                                address: ((_c = from) === null || _c === void 0 ? void 0 : _c.email) || 'equipe@gobarber.com.br',
+                            },
+                            to: { name: to.name, address: to.email },
+                            subject: subject
+                        };
+                        return [4 /*yield*/, this.mailTemplateProvider.parse(templateData)];
+                    case 1: return [4 /*yield*/, _e.apply(_d, [(_f.html = _g.sent(),
+                                _f)])];
+                    case 2:
+                        message = _g.sent();
                         console.log('Message sent: %s', message.messageId);
                         console.log('Preview URl: %s', nodemailer_1.default.getTestMessageUrl(message));
                         return [2 /*return*/];
@@ -76,6 +99,11 @@ var EtherealMailProvider = /** @class */ (function () {
             });
         });
     };
+    EtherealMailProvider = __decorate([
+        tsyringe_1.injectable(),
+        __param(0, tsyringe_1.inject('MailTemplateProvider')),
+        __metadata("design:paramtypes", [Object])
+    ], EtherealMailProvider);
     return EtherealMailProvider;
 }());
 exports.default = EtherealMailProvider;
